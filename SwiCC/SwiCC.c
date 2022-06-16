@@ -293,118 +293,7 @@ void on_uart_rx() {
             }
 
         }
-/*
-        // hard force activated state on command activation
-        if (ch == CMD_CHAR) {
-            cmd_state = C_ACTIVATED;
-            // reset command string
-            cmd_str_ind = 0;
-            memset(cmd_str, 0, sizeof(cmd_str));
-        }
-        else {
-            switch(cmd_state){
-                case C_IDLE:
-                break;
 
-                case C_ACTIVATED:
-                switch(ch){
-                    case 'Q':
-                    cmd_state = C_Q;
-                    break;
-
-                    case 'I':
-                    cmd_state = C_I;
-                    break;
-                    
-                    case 'F':
-                    cmd_state = C_F;
-                    break;
-                    
-                    case 'D':
-                    cmd_state = C_D;
-                    break;
-                    
-                    case 'M': // mode change
-                    cmd_state = C_M;
-                    break;
-                    
-                    case '\r':
-                    case '\n':
-                    cmd_state = C_IDLE;
-
-                    default:
-                    break;
-                }
-                break;
-
-                case C_Q: // queue
-                // end on newline
-                if ((ch == '\r') || (ch == '\n')) {
-                    cmd_state = C_IDLE;
-                    unsigned int rem = add_to_queue(cmd_str, cmd_str_ind);
-//                    if (uart_is_writable(UART_ID)) uart_resp_int(rem);
-                }
-                else {
-                    // put chars in command string
-                    if (cmd_str_ind < 16) {
-                        cmd_str[cmd_str_ind] = ch;
-                        cmd_str_ind++;
-                    }
-                 }
-                break;
-
-                case C_I:
-                // end on newline
-                if ((ch == '\r') || (ch == '\n')) {
-                    cmd_state = C_IDLE;
-                    if (force_con_state(cmd_str, cmd_str_ind) < 0) board_led_write(1);
-                }
-                else {
-                    // put chars in command string
-                    if (cmd_str_ind < 16) {
-                        cmd_str[cmd_str_ind] = ch;
-                        cmd_str_ind++;
-                    }
-                 }
-                break;
-
-                case C_F: // request for buffer fill
-                uart_resp_int(get_buffer_fill());
-                break;
-
-                case C_D: // receiving delay value
-                // end on newline
-                if ((ch == '\r') || (ch == '\n')) {
-                    cmd_state = C_IDLE;
-                    if (set_frame_delay(cmd_str, cmd_str_ind) < 0) board_led_write(1);
-                }
-                else {
-                    // put chars in command string
-                    if (cmd_str_ind < 16) {
-                        cmd_str[cmd_str_ind] = ch;
-                        cmd_str_ind++;
-                    }
-                 }
-
-                case C_M: // receiving mode command
-                // end on newline
-                if ((ch == '\r') || (ch == '\n')) {
-                    cmd_state = C_IDLE;
-                    if (set_frame_delay(cmd_str, cmd_str_ind) < 0) board_led_write(1);
-                }
-                else {
-                    // put chars in command string
-                    if (cmd_str_ind < 16) {
-                        cmd_str[cmd_str_ind] = ch;
-                        cmd_str_ind++;
-                    }
-                 }
-                break;
-                default:
-                cmd_state = C_IDLE;
-            }
-        }
-            */
     }
 }
 
@@ -536,7 +425,8 @@ int force_con_state(char* cstr){
     rt_con.RX = hex2int(cstr+11, 2);
     rt_con.RY = hex2int(cstr+13, 2);
 
-    // Assume that writing an immediate means the user wants to enter a real-time mode.
+    // Assume that writing an immediate means the user wants to enter a real-time mode
+    // (which includes recording mode).
     if ( !( (action_mode == A_RT) || (action_mode == A_REC)) )
         action_mode = A_RT;
 
@@ -607,10 +497,10 @@ void gpio_callback(uint gpio, uint32_t events) {
 
 
 //--------------------------------------------------------------------
-// Unknown code
+// Unknown code -- existed in template and can't be removed, but
+// doesn't seem to do anything important.
 //--------------------------------------------------------------------
 
-// Pretty sure this doesn't do anything in the current configuration.
 uint16_t tud_hid_get_report_cb(uint8_t report_id, hid_report_type_t report_type, uint8_t *buffer, uint16_t reqlen) {
     (void) report_id;
     (void) report_type;
@@ -619,7 +509,6 @@ uint16_t tud_hid_get_report_cb(uint8_t report_id, hid_report_type_t report_type,
     return 0;
 }
 
-// Also doesn't do anything.
 void tud_hid_set_report_cb(uint8_t report_id, hid_report_type_t report_type, uint8_t const *buffer, uint16_t bufsize) {
     (void) report_id;
     (void) report_type;

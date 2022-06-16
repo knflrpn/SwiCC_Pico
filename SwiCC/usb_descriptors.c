@@ -63,6 +63,7 @@ uint8_t const *tud_descriptor_device_cb(void) {
 uint8_t const desc_hid_report[] =
 {
     TUD_HID_REPORT_DESC_USBCON()
+
 };
 
 // Invoked when received GET HID REPORT DESCRIPTOR
